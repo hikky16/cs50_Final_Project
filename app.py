@@ -16,17 +16,19 @@ def index():
 def login():
     form = LoginForm()
     if request.method == "POST":
-        return render_template("login.html")
+        return redirect("/login")
     else:
         return render_template("login.html", form=form)
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
     form = RegistrationForm()
-
     if request.method == "POST":
-
-        return render_template("register.html")
+        if form.validate_on_submit():
+            flash("Account created Successfully", "success")
+            return redirect("/")
+        else:
+            return render_template("register.html", form=form)
     
     else:
         return render_template("register.html", form=form)

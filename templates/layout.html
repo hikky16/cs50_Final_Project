@@ -32,7 +32,15 @@
         </nav>
     </header>
     <main>
-        <div class="container mt-5 pb-2 border border-secondary shadow col-lg-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category,message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="container mt-5 pb-2 border shadow col-lg-6">
+            
             {% block main%}{% endblock %}
         </div>
     </main>
