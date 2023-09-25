@@ -64,7 +64,12 @@ def add():
 @app.route("/project")
 @login_required
 def project():
-    return render_template("projects.html")
+    with engine.connect() as conn:
+        statement = select(project_table)
+        projects = conn.execute(statement)
+        proj = conn.execute(statement)
+    
+    return render_template("projects.html", projects=projects, proj=proj)
 
 @app.route("/addproject", methods=["POST", "GET"])
 @login_required
@@ -72,7 +77,7 @@ def addproject():
     form = AddProject()
     if request.method == "POST":
         with engine.connect() as conn:
-            statement = insert(project_table).values(po=form.po.data,title=form.title.data,amount=form.amount.data, duration=form.duration.data, status=form.status.data,start_date=form.start.data,end_date=form.end.data)
+            statement = insert(project_table).values(po=form.po.data, title=form.title.data, amount=form.amount.data, duration=form.duration.data, status=form.status.data, start_date=form.start.data, end_date=form.end.data)
             conn.execute(statement)
             conn.commit()
             flash("Added New Projects", "success")

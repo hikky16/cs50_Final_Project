@@ -3,5 +3,36 @@
 {% block title %} Projects {% endblock %}
 
 {% block main %}
-<a href="/addproject"><button class="btn btn-outline-primary ">Add Project</button></a>
+<a href="/addproject"><button class="btn btn-outline-primary mb-3">Add Project</button></a>
+<div class="row"></div>
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    {% if projects %}
+    {% for project in projects %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-{{ project.po }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ project.po }}" type="button" role="tab" aria-controls="pills-{{ project.po }}" aria-selected="true">{{ project.po }}</button>
+    </li>
+    {% endfor %}
+</ul>
+    <div class="tab-content" id="pills-tabContent">
+        {% for project in proj %}
+        <div class="tab-pane fade" id="pills-{{ project.po }}" role="tabpanel" aria-labelledby="pills-{{ project.po }}-tab" tabindex="0">
+            <div class="content-section">
+                <p class="h1">{{ project.title }}</p>
+                <div class="vstack gap-2">
+                    <div class="hstack gap-2">
+                        <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Contract Amount: <span>&#8369;</span></span>{{ '{:,.2f}'.format(project.amount) }}</div>
+                        <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Date Started: </span>{{ project.start }}</div>
+                    </div>
+                    <div class="hstack gap-2">
+                        <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project Duration: </span>{{ project.duration }}<span> Days</span></div>
+                        <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project End: </span>{{ project.end }}</div>
+                    </div> 
+                    <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project Status: </span>{{ project.status }}</div>
+                  </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div> 
+    {% endif %}
+  
 {% endblock %}

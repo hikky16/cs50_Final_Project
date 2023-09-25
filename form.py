@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, DateField, SelectField, IntegerField, TextAreaField, FloatField, DateTimeField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, DateField, SelectField, IntegerField, TextAreaField, FloatField, DateField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
 from sqlalchemy import select
 from data_tables import users_table, engine
@@ -36,6 +36,6 @@ class AddProject (FlaskForm):
     amount = FloatField("Contract Amount", validators=[DataRequired()])
     duration = IntegerField("Contract Duration", validators=[DataRequired()])
     status = SelectField("Project Status", choices=[("ONGOING", "ONGOING"), ("DONE","DONE"), ("ONHOLD", "ONHOLD")])
-    start = DateTimeField("Date Started")
-    end = DateTimeField("Date Ended")
+    start = DateField("Date Started", format="%Y-%m-%d")
+    end = DateField("Date Ended", format="%Y-%m-%d")
     submit = SubmitField("Submit")
