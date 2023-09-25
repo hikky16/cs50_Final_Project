@@ -1,5 +1,6 @@
 from flask import Flask, flash, redirect, render_template, request, session
 from form import RegistrationForm, LoginForm
+from helper import login_required
 from sqlalchemy import insert, select
 from data_tables import users_table,engine,meta
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -10,8 +11,9 @@ app.config['SECRET_KEY'] = "jan"
 
     
 @app.route("/")
+@login_required
 def index():
-    return redirect("/login")
+    return render_template("dashboard.html")
 
 
 @app.route("/logout")
@@ -38,7 +40,7 @@ def login():
         
         session["username"] = user.username
 
-        return render_template("dashboard.html")
+        return redirect("/")
     return render_template("login.html", form=form)
 
 @app.route("/register", methods=["POST", "GET"])
