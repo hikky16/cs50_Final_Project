@@ -1,8 +1,8 @@
 from flask import Flask, flash, redirect, render_template, request, session
-from form import RegistrationForm, LoginForm
+from form import RegistrationForm, LoginForm, AddExpenseForm, AddProject
 from helper import login_required
 from sqlalchemy import insert, select
-from data_tables import users_table,engine,meta
+from data_tables import engine, project_table, users_table
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -56,8 +56,29 @@ def register():
         return redirect("/login")
     return render_template("register.html", form=form)
 
+@app.route("/add", methods=["POST", "GET"])
+@login_required
+def add():
+    return render_template("add.html")
 
+@app.route("/project")
+@login_required
+def project():
+    return render_template("projects.html")
 
+@app.route("/addproject", methods=["POST", "GET"])
+@login_required
+def addproject():
+    form = AddProject()
+    if request.method == "POST":
+        with engine.connect() as conn:
+            statement = insert(project_table).values(po=form.po.data,title=form.title.data,amount=form.amount.data, duration=form.duration.data, status=form.status.data,start_date=form.start.data,end_date=form.end.data)
+            conn.execute(statement)
+            conn.commit()
+            flash("Added New Projects", "success")
+            return redirect("/project")
+        
+    return render_template("addprojects.html", form=form)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, DateField, SelectField, IntegerField, TextAreaField, FloatField, DateTimeField
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
 from sqlalchemy import select
 from data_tables import users_table, engine
 
@@ -25,3 +25,17 @@ class LoginForm (FlaskForm):
     submit = SubmitField("Login")
 
 
+class AddExpenseForm (FlaskForm):
+    project_id = SelectField("Project", choices=[])
+    date = DateField("Date")
+
+
+class AddProject (FlaskForm):
+    po = IntegerField("PO Number", validators=[DataRequired(), NumberRange(min= 21000000, max=30000000)])
+    title = TextAreaField("Title", validators=[DataRequired()])
+    amount = FloatField("Contract Amount", validators=[DataRequired()])
+    duration = IntegerField("Contract Duration", validators=[DataRequired()])
+    status = SelectField("Project Status", choices=[("ONGOING", "ONGOING"), ("DONE","DONE"), ("ONHOLD", "ONHOLD")])
+    start = DateTimeField("Date Started")
+    end = DateTimeField("Date Ended")
+    submit = SubmitField("Submit")

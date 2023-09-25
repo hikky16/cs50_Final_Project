@@ -21,8 +21,8 @@ project_table = Table(
     Column("amount",Float,nullable=False),
     Column("duration",Integer,nullable=False),
     Column("status",String(20),nullable=False),
-    Column("start_date",DateTime,nullable=True),
-    Column("end_date",DateTime,nullable=True),
+    Column("start_date",DateTime,nullable=True,),
+    Column("end_date",DateTime,nullable=True,),
 )
 
 type_table = Table(
