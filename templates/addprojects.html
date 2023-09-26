@@ -10,7 +10,17 @@
             <legend class="border-bottom mb-4">ADD PROJECT</legend>
             <div class="form-group col-lg-3 mx-2 my-2">
                 {{ form.po.label(class="form-control-label") }}
-                {{ form.po(class="form-control form-control-md") }}
+
+                {% if form.po.errors %}
+                    {{ form.po(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.po.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.po(class="form-control form-control-md") }}
+                {% endif %}
             </div>
             <div class="form-group mx-2 my-2">
                 {{ form.title.label(class="form-control-label") }}

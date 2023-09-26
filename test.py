@@ -1,8 +1,27 @@
-from sqlalchemy import select
-from data_tables import users_table, engine
+from sqlalchemy import select, insert
+from data_tables import users_table, engine, project_table, type_table
 
+type_list = ["PPE","Tools and Equipment", "Materials" , "Rentals" , "Fuels" , "SOP/Project" , "Misc.Operation" , "Overhead payroll" , "Office Supply" , "Water Utility" , "Power Utility" , "Transportaion" , "Misc. Admin" , "Insurance" , "Cash Advance" , "Labor" , "Solicitation" , "Asset" , "Repair & Maintenance"]
 with engine.connect() as conn:
-    statement = select(users_table).where(users_table.c.id == 2)
-    user = conn.execute(statement).first()
+    for i in type_list:
+        statement = insert(type_table).values(type=i)
+        conn.execute(statement)
+        conn.commit()
 
-print(user.username)
+
+
+# Fuels
+# SOP/ Project
+# Misc. Operation
+# Overhead payroll
+# Office Supply
+# Water Utility
+# Power Utility
+# Trans
+# "Misc. Admin" , "Insurance" , "Cash Advance" , "Labor" , "Solicitation" , "Asset" , "Repair & Maintenance"
+# Insurance
+# Cash Advance
+# Labor
+# Solicitation
+# Asset
+# Repair & Maintenance

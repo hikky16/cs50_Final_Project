@@ -1,8 +1,9 @@
+from datetime import datetime
 from flask import Flask, flash, redirect, render_template, request, session
 from form import RegistrationForm, LoginForm, AddExpenseForm, AddProject
 from helper import login_required
 from sqlalchemy import insert, select
-from data_tables import engine, project_table, users_table
+from data_tables import engine, project_table, users_table, expenses_table
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -56,10 +57,19 @@ def register():
         return redirect("/login")
     return render_template("register.html", form=form)
 
-@app.route("/add", methods=["POST", "GET"])
+@app.route("/addexpense", methods=["POST", "GET"])
 @login_required
 def add():
-    return render_template("add.html")
+    form = AddExpenseForm()
+    if form.validate_on_submit():
+        with engine.connect() as conn:
+            date_now = datetime.utcnow()
+            statement = insert(expenses_table).values(project_id=form.project_id.data, date=form.date.data, description=form.description.data, type_id=form.type_id.data, recipt=form.recipt.data, recipt_no=form.recipt_no.data, no_items=form.no_items.data, unit_cost=form.unit_cost.data, total_cost=form.total_cost.data, time_entered=date_now)
+            conn.execute(statement)
+            conn.commit()
+            flash("Expense Added Successfully", "success")
+        return redirect("/addexpense")
+    return render_template("addexpense.html", form=form)
 
 @app.route("/project")
 @login_required
@@ -68,14 +78,14 @@ def project():
         statement = select(project_table)
         projects = conn.execute(statement)
         proj = conn.execute(statement)
-    
+
     return render_template("projects.html", projects=projects, proj=proj)
 
 @app.route("/addproject", methods=["POST", "GET"])
 @login_required
 def addproject():
     form = AddProject()
-    if request.method == "POST":
+    if form.validate_on_submit():
         with engine.connect() as conn:
             statement = insert(project_table).values(po=form.po.data, title=form.title.data, amount=form.amount.data, duration=form.duration.data, status=form.status.data, start_date=form.start.data, end_date=form.end.data)
             conn.execute(statement)

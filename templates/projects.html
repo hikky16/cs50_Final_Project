@@ -18,14 +18,15 @@
         <div class="tab-pane fade" id="pills-{{ project.po }}" role="tabpanel" aria-labelledby="pills-{{ project.po }}-tab" tabindex="0">
             <div class="content-section">
                 <p class="h1">{{ project.title }}</p>
+                <hr>
                 <div class="vstack gap-2">
                     <div class="hstack gap-2">
                         <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Contract Amount: <span>&#8369;</span></span>{{ '{:,.2f}'.format(project.amount) }}</div>
-                        <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Date Started: </span>{{ project.start }}</div>
+                        <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Date Started: </span>{% if project.start_date == None %}{{ project.start_date }}{% else %}{{ project.start_date.strftime('%Y-%m-%d') }}{% endif %}</div>
                     </div>
                     <div class="hstack gap-2">
                         <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project Duration: </span>{{ project.duration }}<span> Days</span></div>
-                        <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project End: </span>{{ project.end }}</div>
+                        <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project End: </span>{% if project.end_date == None %}{{ project.end_date }}{% else %}{{ project.end_date.strftime('%Y-%m-%d') }}{% endif %}</div>
                     </div> 
                     <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project Status: </span>{{ project.status }}</div>
                   </div>
