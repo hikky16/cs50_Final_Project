@@ -47,3 +47,17 @@ expenses_table = Table(
     Column("total_cost",Float,nullable=False),
     Column("time_entered",DateTime,nullable=False),
 )
+
+project_breakdown = Table(
+    "breakdown",
+    meta,
+    Column("id",Integer,primary_key=True),
+    Column("project_id",ForeignKey("projects.id"),nullable=False),
+    Column("labor",Float,nullable=False),
+    Column("representation",Float,nullable=False),
+    Column("remittance",Float,nullable=False),
+    Column("misc",Float,nullable=False),
+    Column("ppe",Float,nullable=False),
+    Column("materials",Float,nullable=False),
+    Column("tools_equip",Float,nullable=False),
+)

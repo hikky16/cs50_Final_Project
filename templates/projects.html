@@ -31,9 +31,18 @@
                     <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project Status: </span>{{ project.status }}</div>
                   </div>
             </div>
+            <div class="content-section">
+                <hr>
+                {% set item = breakdown | select("project_id") == project.id %}
+                    {% if item.status %}
+                    <p>Content Here</p>
+                    {% else %}
+                    <button class="btn btn-outline-primary">Add Breakdown</button>
+                    {% endif %}           
+             </div>
         </div>
         {% endfor %}
     </div> 
     {% endif %}
-  
+    
 {% endblock %}

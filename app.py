@@ -2,9 +2,10 @@ from datetime import datetime
 from flask import Flask, flash, redirect, render_template, request, session
 from form import RegistrationForm, LoginForm, AddExpenseForm, AddProject
 from helper import login_required
-from sqlalchemy import insert, select
-from data_tables import engine, project_table, users_table, expenses_table
+from sqlalchemy import insert, select, join, text
+from data_tables import engine, project_table, users_table, expenses_table, type_table, project_breakdown
 from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -74,12 +75,24 @@ def add():
 @app.route("/project")
 @login_required
 def project():
+    breakdown = []
     with engine.connect() as conn:
         statement = select(project_table)
         projects = conn.execute(statement)
         proj = conn.execute(statement)
+        y = conn.execute(statement)
+        for i in y:
+            stmt = select(project_breakdown.c.project_id, project_breakdown.c.labor, project_breakdown.c.representation, project_breakdown.c.remittance, project_breakdown.c.misc, project_breakdown.c.ppe, project_breakdown.c.materials, project_breakdown.c.tools_equip).where(project_breakdown.c.id == i.id)
+            proj_break = conn.execute(stmt).first()
+            if proj_break != None:
+                x = {"project_id":proj_break.project_id, "labor":proj_break.labor, "representation":proj_break.represenation, "remittance":proj_break.remittance, "misc":proj_break.misc, "ppe":proj_break.ppe, "materials":proj_break.materials, "tools_equip":proj_break.tools_equip, "status":True}
+                breakdown.append(x)
+            else:
+                x = {"status":False, "project_id":i.id}
+                breakdown.append(x)
 
-    return render_template("projects.html", projects=projects, proj=proj)
+        print(breakdown)
+    return render_template("projects.html", projects=projects, proj=proj, breakdown=breakdown)
 
 @app.route("/addproject", methods=["POST", "GET"])
 @login_required
@@ -94,6 +107,15 @@ def addproject():
             return redirect("/project")
         
     return render_template("addprojects.html", form=form)
+
+@app.route("/expense")
+@login_required
+def expense():
+    with engine.connect() as conn:        
+        statement = text("SELECT title,date,description,type,recipt,recipt_no,no_items,unit_cost,total_cost FROM expenses JOIN projects ON expenses.project_id = projects.id JOIN type ON expenses.type_id = type.id")
+        expenses = conn.execute(statement)
+
+    return render_template("expense.html",expenses=expenses)
 
 if __name__ == "__main__":
     app.run(debug=True)
