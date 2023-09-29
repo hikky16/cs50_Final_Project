@@ -1,12 +1,12 @@
 from sqlalchemy import select, insert
 from data_tables import users_table, engine, project_table, type_table
 
-type_list = ["PPE","Tools and Equipment", "Materials" , "Rentals" , "Fuels" , "SOP/Project" , "Misc.Operation" , "Overhead payroll" , "Office Supply" , "Water Utility" , "Power Utility" , "Transportaion" , "Misc. Admin" , "Insurance" , "Cash Advance" , "Labor" , "Solicitation" , "Asset" , "Repair & Maintenance"]
-with engine.connect() as conn:
-    for i in type_list:
-        statement = insert(type_table).values(type=i)
-        conn.execute(statement)
-        conn.commit()
+# type_list = ["PPE","Tools and Equipment", "Materials" , "Rentals" , "Fuels" , "SOP/Project" , "Misc.Operation" , "Overhead payroll" , "Office Supply" , "Water Utility" , "Power Utility" , "Transportaion" , "Misc. Admin" , "Insurance" , "Cash Advance" , "Labor" , "Solicitation" , "Asset" , "Repair & Maintenance"]
+# with engine.connect() as conn:
+#     for i in type_list:
+#         statement = insert(type_table).values(type=i)
+#         conn.execute(statement)
+#         conn.commit()
 
 
 
@@ -24,4 +24,9 @@ with engine.connect() as conn:
 # Labor
 # Solicitation
 # Asset
-# Repair & Maintenance
+# Repair & Maintenan
+
+mylist = [1,2,3]
+mylist2 = [5,6,7]
+book1 = {"one":mylist,"two":mylist2}
+print(book1)

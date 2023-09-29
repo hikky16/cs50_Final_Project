@@ -7,14 +7,14 @@
 <div class="row"></div>
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     {% if projects %}
-    {% for project in projects %}
+    {% for project in projects|rejectattr('title','equalto','ADMIN') %}
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="pills-{{ project.po }}-tab" data-bs-toggle="pill" data-bs-target="#pills-{{ project.po }}" type="button" role="tab" aria-controls="pills-{{ project.po }}" aria-selected="true">{{ project.po }}</button>
     </li>
     {% endfor %}
 </ul>
     <div class="tab-content" id="pills-tabContent">
-        {% for project in proj %}
+        {% for project in proj|rejectattr('title','equalto','ADMIN') %}
         <div class="tab-pane fade" id="pills-{{ project.po }}" role="tabpanel" aria-labelledby="pills-{{ project.po }}-tab" tabindex="0">
             <div class="content-section">
                 <p class="h1">{{ project.title }}</p>
@@ -29,16 +29,93 @@
                         <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project End: </span>{% if project.end_date == None %}{{ project.end_date }}{% else %}{{ project.end_date.strftime('%Y-%m-%d') }}{% endif %}</div>
                     </div> 
                     <div class="p-2 border shadow col-lg-3"><span class="fw-bold">Project Status: </span>{{ project.status }}</div>
-                  </div>
+                </div>
             </div>
             <div class="content-section">
                 <hr>
-                {% set item = breakdown | select("project_id") == project.id %}
+                {% for item in breakdown|selectattr('project_id','equalto',project.id) %}
                     {% if item.status %}
-                    <p>Content Here</p>
+                    <div class="vstack gap-2">   
+                        <div class="hstack gap-3">
+                            <div class="col border shadow col-lg-2 p-1">
+                                <span class="fw-bold">Labor Budget:</span>
+                                <div><span>&#8369;{{ '{:,.2f}'.format(item.labor) }}</span></div>
+                                <hr>
+                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_labor) }}</span>
+                            </div>
+                            <div class="col border shadow col-lg-2 p-1">
+                                <span class="fw-bold">Representation Budget:</span>
+                                <div><span>&#8369;{{ '{:,.2f}'.format(item.representation) }}</span></div>
+                                <hr>
+                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_representation) }}</span>
+                            </div>
+                            <div class="col border shadow col-lg-2 p-1">
+                                <span class="fw-bold">Remittance Budget:</span>
+                                <div><span>&#8369;{{ '{:,.2f}'.format(item.remittance) }}</span></div>
+                                <hr>
+                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_remittance) }}</span>
+                            </div>
+                            <div class="col border shadow col-lg-2 p-1">
+                                <span class="fw-bold">Miscellaneus Budget:</span>
+                                <div><span>&#8369;{{ '{:,.2f}'.format(item.misc) }}</span></div>
+                                <hr>
+                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_misc) }}</span>
+                            </div>
+                        </div>
+                        <div class="hstack gap-3">
+                            <div class="col border shadow col-lg-2 p-1">
+                                <span class="fw-bold">PPE Budget:</span>
+                                <div><span>&#8369;{{ '{:,.2f}'.format(item.ppe) }}</span></div>
+                                <hr>
+                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_ppe) }}</span>
+                            </div>
+                            <div class="col border shadow col-lg-2 p-1">
+                                <span class="fw-bold">Materials Budget:</span>
+                                <div><span>&#8369;{{ '{:,.2f}'.format(item.materials) }}</span></div>
+                                <hr>
+                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_materials) }}</span>
+                            </div>
+                            <div class="col border shadow col-lg-2 p-1">
+                                <span class="fw-bold">Tools/Equipment Budget:</span>
+                                <div><span>&#8369;{{ '{:,.2f}'.format(item.tools_equip) }}</span></div>
+                                <hr>
+                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_tools_equip) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-hover table-bordered table-sm align-middle align-top caption-top">
+                        <caption>All Expenses</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Recipt</th>
+                                    <th scope="col">Recipt No.</th>
+                                    <th scope="col">No of Items</th>
+                                    <th scope="col">Unit Cost</th>
+                                    <th scope="col">Total Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for ex in item.pro_expen %}
+                                <tr>
+                                    <td>{{ ex.date.split()[0] }}</td>
+                                    <td>{{ ex.description }}</td>
+                                    <td>{{ ex.type }}</td>
+                                    <td>{{ ex.recipt }}</td>
+                                    <td>{{ ex.recipt_no }}</td>
+                                    <td>{{ ex.no_items }}</td>
+                                    <td>&#8369;{{ '{:,.2f}'.format(ex.unit_cost) }}</td>
+                                    <td>&#8369;{{ '{:,.2f}'.format(ex.total_cost) }}</td>
+                                </tr>
+                            {% endfor %} 
+                            </tbody>
+                    </table>
                     {% else %}
-                    <button class="btn btn-outline-primary">Add Breakdown</button>
-                    {% endif %}           
+                    <a href="/breakdown"><button class="btn btn-outline-primary">Add Breakdown</button></a>
+                    {% endif %}
+                {% endfor %}    
              </div>
         </div>
         {% endfor %}
