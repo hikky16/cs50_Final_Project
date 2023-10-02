@@ -35,56 +35,145 @@
                 <hr>
                 {% for item in breakdown|selectattr('project_id','equalto',project.id) %}
                     {% if item.status %}
-                    <div class="vstack gap-2">   
-                        <div class="hstack gap-3">
-                            <div class="col border shadow col-lg-2 p-1">
-                                <span class="fw-bold">Labor Budget:</span>
-                                <div><span>&#8369;{{ '{:,.2f}'.format(item.labor) }}</span></div>
-                                <hr>
-                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_labor) }}</span>
-                            </div>
-                            <div class="col border shadow col-lg-2 p-1">
-                                <span class="fw-bold">Representation Budget:</span>
-                                <div><span>&#8369;{{ '{:,.2f}'.format(item.representation) }}</span></div>
-                                <hr>
-                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_representation) }}</span>
-                            </div>
-                            <div class="col border shadow col-lg-2 p-1">
-                                <span class="fw-bold">Remittance Budget:</span>
-                                <div><span>&#8369;{{ '{:,.2f}'.format(item.remittance) }}</span></div>
-                                <hr>
-                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_remittance) }}</span>
-                            </div>
-                            <div class="col border shadow col-lg-2 p-1">
-                                <span class="fw-bold">Miscellaneus Budget:</span>
-                                <div><span>&#8369;{{ '{:,.2f}'.format(item.misc) }}</span></div>
-                                <hr>
-                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_misc) }}</span>
-                            </div>
-                        </div>
-                        <div class="hstack gap-3">
-                            <div class="col border shadow col-lg-2 p-1">
-                                <span class="fw-bold">PPE Budget:</span>
-                                <div><span>&#8369;{{ '{:,.2f}'.format(item.ppe) }}</span></div>
-                                <hr>
-                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_ppe) }}</span>
-                            </div>
-                            <div class="col border shadow col-lg-2 p-1">
-                                <span class="fw-bold">Materials Budget:</span>
-                                <div><span>&#8369;{{ '{:,.2f}'.format(item.materials) }}</span></div>
-                                <hr>
-                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_materials) }}</span>
-                            </div>
-                            <div class="col border shadow col-lg-2 p-1">
-                                <span class="fw-bold">Tools/Equipment Budget:</span>
-                                <div><span>&#8369;{{ '{:,.2f}'.format(item.tools_equip) }}</span></div>
-                                <hr>
-                                <span><span class="fw-bold">Remaining: </span>&#8369;{{ '{:,.2f}'.format(item.re_tools_equip) }}</span>
-                            </div>
-                        </div>
+                    <div class="row">
+                        <ol class="list-group col-6">
+                            <li class="list-group-item">
+                                <div class="hstack gap-1">
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Labor Budget:</span></div>
+                                        <div><span>&#8369;{{ '{:,.2f}'.format(item.labor) }}</span></div>
+                                    </div>
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Remaining:</span></div>
+                                        {% if item.re_labor <= 0 %}
+                                        <div class="text-danger"><span>&#8369;{{ '{:,.2f}'.format(item.re_labor) }}</span></div>
+                                        {% else %}
+                                        <div class="text-success"><span>&#8369;{{ '{:,.2f}'.format(item.re_labor) }}</span></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="hstack gap-1">
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Representation Budget:</span></div>
+                                        <div><span>&#8369;{{ '{:,.2f}'.format(item.representation) }}</span></div>
+                                    </div>
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Remaining:</span></div>
+                                        {% if item.re_representation <= 0 %}
+                                        <div class="text-danger"><span>&#8369;{{ '{:,.2f}'.format(item.re_representation) }}</span></div>
+                                        {% else %}
+                                        <div class="text-success"><span>&#8369;{{ '{:,.2f}'.format(item.re_representation) }}</span></div>
+                                        {% endif %}                                    
+                                    </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="hstack gap-1">
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Remittance Budget:</span></div>
+                                        <div><span>&#8369;{{ '{:,.2f}'.format(item.remittance) }}</span></div>
+                                    </div>
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Remaining:</span></div>
+                                        {% if item.re_remittance <= 0 %}
+                                        <div class="text-danger"><span>&#8369;{{ '{:,.2f}'.format(item.re_remittance) }}</span></div>
+                                        {% else %}
+                                        <div class="text-success"><span>&#8369;{{ '{:,.2f}'.format(item.re_remittance) }}</span></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="hstack gap-1">
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Miscellaneus Budget:</span></div>
+                                        <div><span>&#8369;{{ '{:,.2f}'.format(item.misc) }}</span></div>
+                                    </div>
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Remaining:</span></div>
+                                        {% if item.re_misc <= 0 %}
+                                        <div class="text-danger"><span>&#8369;{{ '{:,.2f}'.format(item.re_misc) }}</span></div>
+                                        {% else %}
+                                        <div class="text-success"><span>&#8369;{{ '{:,.2f}'.format(item.re_misc) }}</span></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                        </ol>
+                        <ol class="list-group col-6">
+                            <li class="list-group-item">
+                                <div class="hstack gap-1">
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">PPE Budget:</span></div>
+                                        <div><span>&#8369;{{ '{:,.2f}'.format(item.ppe) }}</span></div>
+                                    </div>
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Remaining:</span></div>
+                                        {% if item.re_ppe <= 0 %}
+                                        <div class="text-danger"><span>&#8369;{{ '{:,.2f}'.format(item.re_ppe) }}</span></div>
+                                        {% else %}
+                                        <div class="text-success"><span>&#8369;{{ '{:,.2f}'.format(item.re_ppe) }}</span></div>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="hstack gap-1">
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Materials Budget:</span></div>
+                                        <div><span>&#8369;{{ '{:,.2f}'.format(item.materials) }}</span></div>
+                                    </div>
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Remaining:</span></div>
+                                        {% if item.re_materials <= 0 %}
+                                        <div class="text-danger"><span>&#8369;{{ '{:,.2f}'.format(item.re_materials) }}</span></div>
+                                        {% else %}
+                                        <div class="text-success"><span>&#8369;{{ '{:,.2f}'.format(item.re_materials) }}</span></div>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="hstack gap-1">
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Tools and Equipment Budget:</span></div>
+                                        <div><span>&#8369;{{ '{:,.2f}'.format(item.tools_equip) }}</span></div>
+                                    </div>
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Remaining:</span></div>
+                                        {% if item.re_tools_equip <= 0 %}
+                                        <div class="text-danger"><span>&#8369;{{ '{:,.2f}'.format(item.re_tools_equip) }}</span></div>
+                                        {% else %}
+                                        <div class="text-success"><span>&#8369;{{ '{:,.2f}'.format(item.re_tools_equip) }}</span></div>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="hstack gap-1">
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Total Budget:</span></div>
+                                        <div><span>&#8369;{{ '{:,.2f}'.format(item.total) }}</span></div>
+                                    </div>
+                                    <div class="vstack gap-1 col-2">
+                                        <div><span class="fw-bold">Total Remaining:</span></div>
+                                        {% if item.re_total <= 0 %}
+                                        <div class="text-danger"><span>&#8369;{{ '{:,.2f}'.format(item.re_total) }}</span></div>
+                                        {% else %}
+                                        <div class="text-success fw-bold"><span>&#8369;{{ '{:,.2f}'.format(item.re_total) }}</span></div>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </li>
+                        </ol>
                     </div>
                     <table class="table table-hover table-bordered table-sm align-middle align-top caption-top">
-                        <caption>All Expenses</caption>
+                        <caption>All Expenses Total: &#8369;{{ '{:,.2f}'.format(item.ex_total) }}</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">Date</th>
@@ -113,7 +202,11 @@
                             </tbody>
                     </table>
                     {% else %}
-                    <a href="/breakdown"><button class="btn btn-outline-primary">Add Breakdown</button></a>
+                    <form action="/breakdown" method="post">
+                        <input value="{{ item.project_id }}" id="test" type="hidden" name="project_id">
+                        <input value="projects" type="hidden" name="source">
+                        <button class="btn btn-outline-primary">Add Breakdown</button>
+                    </form>
                     {% endif %}
                 {% endfor %}    
              </div>

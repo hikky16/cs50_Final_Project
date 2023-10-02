@@ -1,0 +1,163 @@
+{% extends "dashboard.html" %}
+
+{% block title %} Breakdown {% endblock %}
+
+{% block main %}
+    <div class="content-section">
+        <form action="/breakdown" method="post">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Project Breakdown</legend>
+                {{ form.id(value="{{ project_id }}") }}
+                <div class="form-group col-3">
+                    {{ form.labor.label(class="form-control-label") }}
+                    {% if form.labor.errors %}
+                        {{ form.labor(class="form-control form-control-md is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.labor.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.labor(class="form-control form-control-md col-3") }}
+                    {% endif %}
+                </div>
+                <div class="form-group col-3">
+                    {{ form.representation.label(class="form-control-label") }}
+                    {% if form.representation.errors %}
+                        {{ form.representation(class="form-control form-control-md is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.representation.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.representation(class="form-control form-control-md") }}
+                    {% endif %}
+                </div>
+                <div class="form-group col-3">
+                    {{ form.remittance.label(class="form-control-label") }}
+                    {% if form.remittance.errors %}
+                        {{ form.remittance(class="form-control form-control-md is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.remittance.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.remittance(class="form-control form-control-md") }}
+                    {% endif %}
+                </div>
+                <div class="form-group col-3">
+                    {{ form.misc.label(class="form-control-label") }}
+                    {% if form.misc.errors %}
+                        {{ form.misc(class="form-control form-control-md is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.misc.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.misc(class="form-control form-control-md") }}
+                    {% endif %}
+                </div>
+                <div class="form-group col-3">
+                    {{ form.ppe.label(class="form-control-label") }}
+                    {% if form.ppe.errors %}
+                        {{ form.ppe(class="form-control form-control-md is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.ppe.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.ppe(class="form-control form-control-md") }}
+                    {% endif %}
+                </div>
+                <div class="form-group col-3">
+                    {{ form.materials.label(class="form-control-label") }}
+                    {% if form.materials.errors %}
+                        {{ form.materials(class="form-control form-control-md is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.materials.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.materials(class="form-control form-control-md") }}
+                    {% endif %}
+                </div>
+                <div class="form-group col-3">
+                    {{ form.tools_equip.label(class="form-control-label") }}
+                    {% if form.tools_equip.errors %}
+                        {{ form.tools_equip(class="form-control form-control-md is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.tools_equip.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.tools_equip(class="form-control form-control-md") }}
+                    {% endif %}
+                </div>
+                <div class="form-group col-3">
+                    {{ form.total.label(class="form-control-label") }}
+                    {% if form.total.errors %}
+                        {{ form.total(class="form-control form-control-md is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.total.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.total(class="form-control form-control-md") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <div class="container mt-4">
+                {{ form.submit(class="btn btn-outline-primary")}}
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let field1 = document.getElementById('labor');
+        let field2 = document.getElementById('representation');
+        let field3 = document.getElementById('remittance');
+        let field4 = document.getElementById('misc');
+        let field5 = document.getElementById('ppe');
+        let field6 = document.getElementById('materials');
+        let field7 = document.getElementById('tools_equip');
+        let resultfield = document.getElementById('total');
+
+        function calculateResult() {
+            let value1 = parseFloat(field1.value);
+            let value2 = parseFloat(field2.value);
+            let value3 = parseFloat(field3.value);
+            let value4 = parseFloat(field4.value);
+            let value5 = parseFloat(field5.value);
+            let value6 = parseFloat(field6.value);
+            let value7 = parseFloat(field7.value);
+            let result = value1 + value2 + value3 + value4 + value5 + value6 + value7;
+
+            if (!isNaN(result)) {
+                result = result.toFixed(2);
+                resultfield.value = result;
+            } else {
+                resultfield.value = 0;
+            }
+        }
+
+        field1.addEventListener('input', calculateResult);
+        field2.addEventListener('input', calculateResult);
+        field3.addEventListener('input', calculateResult);
+        field4.addEventListener('input', calculateResult);
+        field5.addEventListener('input', calculateResult);
+        field6.addEventListener('input', calculateResult);
+        field7.addEventListener('input', calculateResult);
+    });
+</script>
+{% endblock %}

@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Flask, flash, redirect, render_template, request, session
-from form import RegistrationForm, LoginForm, AddExpenseForm, AddProject
-from helper import login_required
+from form import RegistrationForm, LoginForm, AddExpenseForm, AddProject, ProjectBreakdown
+from helper import login_required, get_x
 from sqlalchemy import insert, select, join, text, func
 from data_tables import engine, project_table, users_table, expenses_table, type_table, project_breakdown
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -85,61 +85,7 @@ def project():
             stmt = select(project_breakdown.c.project_id, project_breakdown.c.labor, project_breakdown.c.representation, project_breakdown.c.remittance, project_breakdown.c.misc, project_breakdown.c.ppe, project_breakdown.c.materials, project_breakdown.c.tools_equip).where(project_breakdown.c.project_id == i.id)
             proj_break = conn.execute(stmt).first()
             if proj_break != None:
-                labor_stmt = select(func.sum(expenses_table.c.total_cost)).select_from(expenses_table).where(expenses_table.c.project_id == i.id, expenses_table.c.type_id == 16)
-                rep_stmt = select(func.sum(expenses_table.c.total_cost)).select_from(expenses_table).where(expenses_table.c.project_id == i.id, expenses_table.c.type_id == 6)
-                rem_stmt = select(func.sum(expenses_table.c.total_cost)).select_from(expenses_table).where(expenses_table.c.project_id == i.id, expenses_table.c.type_id == 14)
-                misc_stmt = select(func.sum(expenses_table.c.total_cost)).select_from(expenses_table).where(expenses_table.c.project_id == i.id, expenses_table.c.type_id == 7)
-                ppe_stmt = select(func.sum(expenses_table.c.total_cost)).select_from(expenses_table).where(expenses_table.c.project_id == i.id, expenses_table.c.type_id == 1)
-                mat_stmt = select(func.sum(expenses_table.c.total_cost)).select_from(expenses_table).where(expenses_table.c.project_id == i.id, expenses_table.c.type_id == 3)
-                tol_stmt = select(func.sum(expenses_table.c.total_cost)).select_from(expenses_table).where(expenses_table.c.project_id == i.id, expenses_table.c.type_id == 2)
-
-                labor = conn.execute(labor_stmt).first()
-                if labor.sum_1 == None:
-                    labor = 0
-                else:
-                    labor = labor.sum_1
-
-                rep = conn.execute(rep_stmt).first()
-                if rep.sum_1 == None:
-                    rep = 0
-                else:
-                    rep = rep.sum_1
-
-                remit = conn.execute(rem_stmt).first()
-                if remit.sum_1 == None:
-                    remit = 0
-                else:
-                    remit = remit.sum_1
-
-                misc = conn.execute(misc_stmt).first()
-                if misc.sum_1 == None:
-                    misc = 0
-                else:
-                    misc = misc.sum_1
-
-                ppe = conn.execute(ppe_stmt).first()
-                if ppe.sum_1 == None:
-                    ppe = 0
-                else:
-                    ppe = ppe.sum_1
-
-                mat = conn.execute(mat_stmt).first()
-                if mat.sum_1 == None:
-                    mat = 0
-                else:
-                    mat = mat.sum_1
-
-                tol = conn.execute(tol_stmt).first()
-                if tol.sum_1 == None:
-                    tol = 0
-                else:
-                    tol = tol.sum_1
-
-                pro_expenses = conn.execute(text(f"SELECT title,date,description,type,recipt,recipt_no,no_items,unit_cost,total_cost FROM expenses JOIN projects ON expenses.project_id = projects.id JOIN type ON expenses.type_id = type.id WHERE project_id ={i.id} ORDER BY date DESC"))
-                expen = []
-                for z in pro_expenses:
-                    expen.append(z)
-                x = {"project_id":proj_break.project_id, "labor":proj_break.labor, "representation":proj_break.representation, "remittance":proj_break.remittance, "misc":proj_break.misc, "ppe":proj_break.ppe, "materials":proj_break.materials, "tools_equip":proj_break.tools_equip, "status":True, "re_labor":proj_break.labor - labor, "re_representation":proj_break.representation - rep, "re_remittance":proj_break.remittance - remit, "re_misc":proj_break.misc - misc, "re_ppe":proj_break.ppe - ppe, "re_materials":proj_break.materials - mat, "re_tools_equip":proj_break.tools_equip - tol, "pro_expen":expen}
+                x = get_x(proj_break,i,conn)
                 breakdown.append(x)
             else:
                 x = {"status":False, "project_id":i.id}
@@ -168,6 +114,37 @@ def expense():
         expenses = conn.execute(statement)
 
     return render_template("expense.html",expenses=expenses)
+
+@app.route("/breakdown", methods=["POST"])
+@login_required
+def breakdown():
+    if request.form.get("source") == "projects":
+        form = ProjectBreakdown()
+        project_id = request.form.get("project_id")
+        return render_template("breakdown.html", project_id=project_id, form=form)
+    else:
+        project_id = request.form.get("project_id")
+        form = ProjectBreakdown()
+        if form.validate_on_submit():
+            with engine.connect() as conn:
+                stmt = select(project_table.c.amount).where(project_table.c.id == project_id)
+                budget = conn.execute(stmt).first()
+
+            if budget.amount < form.total.data:
+                flash("Total Amount is greater than contract amount", "danger")
+                return render_template("breakdown.html", project_id=project_id, form=form)
+            
+            with engine.connect() as conn:
+                stmt = insert(project_breakdown).values(project_id=project_id, labor=form.labor.data, representation=form.representation.data, remittance=form.remittance.data, misc=form.misc.data, ppe=form.ppe.data, materials=form.materials.data, tools_equip=form.tools_equip.data)
+                conn.execute(stmt)
+                conn.commit()
+                flash("Breakdown Successfully Added", "success")
+                return redirect("/project")
+        return render_template("breakdown.html", project_id=project_id, form=form)
+    
+    
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

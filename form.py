@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, DateField, SelectField, IntegerField, TextAreaField, FloatField, DateField, RadioField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, DateField, SelectField, IntegerField, TextAreaField, FloatField, DateField, RadioField, HiddenField
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange, InputRequired
 from sqlalchemy import select
-from data_tables import users_table, engine, project_table, type_table
+from data_tables import users_table, engine, project_table, type_table,project_breakdown
 
 class RegistrationForm (FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min= 3, max= 20)])
@@ -61,3 +61,15 @@ class AddProject (FlaskForm):
         
         if po1:
             raise ValidationError("Duplicate PO Number")
+        
+class ProjectBreakdown (FlaskForm):
+    id = HiddenField(name="project_id",validators=[DataRequired()])
+    labor = FloatField("Labor Budget Amount", validators=[InputRequired(), NumberRange(min=0)])
+    representation = FloatField("Representation Budget Amount", validators=[InputRequired(), NumberRange(min=0)])
+    remittance = FloatField("Remittance Budget Amount", validators=[InputRequired(), NumberRange(min=0)])
+    misc = FloatField("Miscellaneus Budget Amount", validators=[InputRequired(), NumberRange(min=0)])
+    ppe = FloatField("PPE Budget Amount", validators=[InputRequired(), NumberRange(min=0)])
+    materials = FloatField("Materials Budget Amount", validators=[InputRequired(), NumberRange(min=0)])
+    tools_equip = FloatField("Tools and Equipment Budget Amount", validators=[InputRequired(), NumberRange(min=0)])
+    total = FloatField("Total Budget Amount", validators=[InputRequired(), NumberRange(min=1)])
+    submit = SubmitField("Submit")

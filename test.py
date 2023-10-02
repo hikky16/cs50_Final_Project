@@ -26,7 +26,8 @@ from data_tables import users_table, engine, project_table, type_table
 # Asset
 # Repair & Maintenan
 
-mylist = [1,2,3]
-mylist2 = [5,6,7]
-book1 = {"one":mylist,"two":mylist2}
-print(book1)
+with engine.connect() as conn:
+    statement = select(project_table.c.amount).where(project_table.c.id == 9)
+    amount = conn.execute(statement).first()
+
+print(amount.amount)
