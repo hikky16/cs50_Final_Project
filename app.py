@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Flask, flash, redirect, render_template, request, session
 from form import RegistrationForm, LoginForm, AddExpenseForm, AddProject, ProjectBreakdown
-from helper import login_required, get_x
+from helper import login_required, get_x,get_monthly_expense, get_project_list
 from sqlalchemy import insert, select, join, text, func
 from data_tables import engine, project_table, users_table, expenses_table, type_table, project_breakdown
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -15,7 +15,29 @@ app.config['SECRET_KEY'] = "jan"
 @app.route("/")
 @login_required
 def index():
-    return render_template("dashboard.html")
+    with engine.connect() as conn:
+        stmt = select(func.sum(project_table.c.amount)).select_from(project_table)
+        contract_amount = conn.execute(stmt).first()
+        stmt2 = select(func.sum(expenses_table.c.total_cost)).select_from(expenses_table).where(expenses_table.c.project_id == 1)
+        total_admin = conn.execute(stmt2).first()
+
+    monthly = get_monthly_expense()
+    expense_total = 0
+    for i in monthly:
+        expense_total += i
+
+    project_list = []
+    get_project_list(project_list)
+
+    labels_chart2 = []
+    for i in project_list:
+        labels_chart2.append(i["po"])
+    
+    project_expenses = 0
+    for i in project_list:
+        project_expenses += i["expense"]
+
+    return render_template("home.html",monthly=monthly,total_amount=contract_amount.sum_1,expense_total=expense_total,labels_chart2=labels_chart2,project_list=project_list,total_admin=total_admin,project_expenses=project_expenses)
 
 
 @app.route("/logout")
@@ -142,8 +164,13 @@ def breakdown():
                 return redirect("/project")
         return render_template("breakdown.html", project_id=project_id, form=form)
     
-    
-
+@app.route("/admin")    
+@login_required
+def admin():
+    with engine.connect() as conn:        
+        statement = text("SELECT date,description,type,recipt,recipt_no,no_items,unit_cost,total_cost FROM expenses JOIN projects ON expenses.project_id = projects.id JOIN type ON expenses.type_id = type.id WHERE expenses.project_id = 1")
+        expenses = conn.execute(statement)
+    return render_template("admin.html",expenses=expenses)
 
 
 if __name__ == "__main__":

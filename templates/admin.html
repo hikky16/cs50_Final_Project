@@ -4,10 +4,9 @@
 
 {% block main %}
     <table class="table table-hover table-bordered table-sm align-middle align-top caption-top">
-        <caption>All Expenses</caption>
+        <caption>Admin Expenses</caption>
         <thead>
             <tr>
-                <th scope="col">Charged to</th>
                 <th scope="col">Date</th>
                 <th scope="col">Description</th>
                 <th scope="col">Type</th>
@@ -22,7 +21,6 @@
             {% if expenses %}
                 {% for i in expenses %}
                     <tr>
-                        <td>{{ i.title }}</td>
                         <td>{{ i.date.split()[0] }}</td>
                         <td>{{ i.description }}</td>
                         <td>{{ i.type }}</td>
@@ -37,3 +35,4 @@
         </tbody>
     </table>
 {% endblock %}
+

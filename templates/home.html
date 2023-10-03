@@ -1,0 +1,112 @@
+{% extends "dashboard.html" %}
+
+{% block title %} Home {% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="col-lg-8"><canvas id="myChart"></canvas></div>
+    <div class="col-lg-auto">
+      <div class="vstack gap-2">
+        <div class="card p-2" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Contract Amount</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Total</h6>
+            <hr>
+            <p class="card-text">&#8369;{{ '{:,.2f}'.format(total_amount) }} </p>
+          </div>
+        </div>
+        <div class="card p-2" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Total Expenses</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Total</h6>
+            <hr>
+            <p class="card-text">&#8369;{{ '{:,.2f}'.format(expense_total) }} </p>
+          </div>
+        </div>
+      </div>          
+    </div>
+</div>
+<hr>
+<div class="row">
+  <div class="col-lg-8"><canvas id="myChart2"></canvas></div>
+  <div class="col-lg-auto">
+    <div class="vstack gap-2">
+      <div class="card p-2" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">Admin Expenses</h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">Total</h6>
+          <hr>
+          <p class="card-text">&#8369;{{ '{:,.2f}'.format(total_admin.sum_1) }} </p>
+        </div>
+      </div>
+      <div class="card p-2" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">Project Expenses</h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">Total</h6>
+          <hr>
+          <p class="card-text">&#8369;{{ '{:,.2f}'.format(project_expenses) }} </p>
+        </div>
+      </div>
+    </div>          
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const ctx = document.getElementById('myChart');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['January', 'Febuary', 'March', 'April', 'May', 'June','July','August','September','October','November','December'],
+      datasets: [{
+        label: 'Expenses per Month',
+        data: {{ monthly }},
+        borderWidth: 1,
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+<script>
+    const ctx2 = document.getElementById('myChart2');
+  
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: {{ labels_chart2 }},
+        datasets: [
+        {
+          label: 'Contract Amount',
+          data: [{% for i in project_list %}{{i.amount}},{% endfor %}],
+          backgroundColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1,
+        },
+        {
+          label: 'Total Expenses',
+          data: [{% for i in project_list %}{{i.expense}},{% endfor %}],
+          backgroundColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1,
+        }
+       ]
+      },
+      options: {
+        indexAxis: 'y',
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+</script>
+{% endblock %}
