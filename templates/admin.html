@@ -1,0 +1,52 @@
+{% extends "dashboard.html" %}
+
+{% block title %} Expenses {% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block main %}
+    <table class="table table-hover table-bordered table-sm align-middle align-top caption-top" id="table">
+        <caption>Admin Expenses</caption>
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Description</th>
+                <th scope="col">Type</th>
+                <th scope="col">Recipt</th>
+                <th scope="col">Recipt No.</th>
+                <th scope="col">No of Items</th>
+                <th scope="col">Unit Cost</th>
+                <th scope="col">Total Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if expenses %}
+                {% for i in expenses %}
+                    <tr>
+                        <td>{{ i.date.split()[0] }}</td>
+                        <td>{{ i.description }}</td>
+                        <td>{{ i.type }}</td>
+                        <td>{{ i.recipt }}</td>
+                        <td>{{ i.recipt_no }}</td>
+                        <td>{{ i.no_items }}</td>
+                        <td>&#8369;{{ '{:,.2f}'.format(i.unit_cost) }}</td>
+                        <td>&#8369;{{ '{:,.2f}'.format(i.total_cost) }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block script%}
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    new DataTable('#table');
+</script>
+{% endblock %}
+

@@ -18,36 +18,96 @@
                             <span>{{ error }}</span>
                         {% endfor %}
                     </div>
-                {% else %}
-                    {{ form.po(class="form-control form-control-md") }}
-                {% endif %}
+                    {% else %}
+                        {{ form.po(class="form-control form-control-md") }}
+                    {% endif %}
             </div>
             <div class="form-group mx-2 my-2">
                 {{ form.title.label(class="form-control-label") }}
-                {{ form.title(class="form-control form-control-md") }}
+
+                {% if form.title.errors %}
+                    {{ form.title(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.title.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{ form.title(class="form-control form-control-md") }}
+                    {% endif %}
             </div>
             <div class="row p-2">
                 <div class="form-group col-lg-4">
-                    {{ form.amount.label(class="form-control-label") }}
-                    {{ form.amount(class="form-control form-control-md") }}
+                {{ form.amount.label(class="form-control-label") }}
+
+                {% if form.amount.errors %}
+                    {{ form.amount(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.amount.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{ form.amount(class="form-control form-control-md") }}
+                    {% endif %}
                 </div>
                 <div class="form-group col-lg-4">
                     {{ form.duration.label(class="form-control-label") }}
-                    {{ form.duration(class="form-control form-control-md") }}
+
+                    {% if form.duration.errors %}
+                    {{ form.duration(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.duration.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{ form.duration(class="form-control form-control-md") }}
+                    {% endif %}
                 </div>
                 <div class="form-group col-lg-4">
                     {{ form.status.label(class="form-control-label") }}
-                    {{ form.status(class="form-select form-select-md") }}
+
+                    {% if form.status.errors %}
+                    {{ form.status(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.status.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{ form.status(class="form-control form-control-md") }}
+                    {% endif %}
                 </div>
             </div>          
             <div class="row p-2">
                 <div class="form-group col-lg-3">
                     {{ form.start.label(class="form-control-label") }}
-                    {{ form.start(class="form-control form-control-md",type="date") }}
+
+                    {% if form.start.errors %}
+                    {{ form.start(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.start.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{ form.start(class="form-control form-control-md") }}
+                    {% endif %}
                 </div>
                 <div class="form-group col-lg-3">
                     {{ form.end.label(class="form-control-label") }}
-                    {{ form.end(class="form-control form-control-md",type="date") }}
+
+                    {% if form.end.errors %}
+                    {{ form.end(class="form-control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.end.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        {{ form.end(class="form-control form-control-md") }}
+                    {% endif %}
                 </div>
             </div>          
         </fieldset>

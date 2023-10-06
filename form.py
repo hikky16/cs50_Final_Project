@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, DateField, SelectField, IntegerField, TextAreaField, FloatField, DateField, RadioField, HiddenField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange, InputRequired
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, DateField, SelectField, IntegerField, TextAreaField, FloatField, RadioField, HiddenField
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange, InputRequired, StopValidation, Optional
 from sqlalchemy import select
 from data_tables import users_table, engine, project_table, type_table,project_breakdown
 
@@ -37,8 +37,8 @@ class AddExpenseForm (FlaskForm):
     date = DateField("Date", validators=[DataRequired()], format="%Y-%m-%d")
     description = StringField("Description", validators=[DataRequired(), Length(max=200)])
     type_id = SelectField("Expense Type", choices=[(i.id, i.type) for i in types])
-    recipt = RadioField("Recipt Type", choices=[("VC","Voucher"),("OR","Official Recipt")], validators=[DataRequired()])
-    recipt_no = StringField("Recipt No.", validators=[DataRequired()])
+    recipt = RadioField("Recipt Type", choices=[("VC","Voucher"),("OR","Official Recipt")], validators=[Optional()])
+    recipt_no = StringField("Recipt No.", validators=[Optional()])
     no_items = IntegerField("Number of Items", validators=[DataRequired(), NumberRange(min=1)])
     unit_cost = FloatField("Cost per Item", validators=[DataRequired(), NumberRange(min=0.1)])
     total_cost = FloatField("Total Cost", validators=[DataRequired(), NumberRange(min=0.1)])
@@ -50,8 +50,8 @@ class AddProject (FlaskForm):
     amount = FloatField("Contract Amount", validators=[DataRequired()])
     duration = IntegerField("Contract Duration", validators=[DataRequired()])
     status = SelectField("Project Status", choices=[("ONGOING", "ONGOING"), ("DONE","DONE"), ("ONHOLD", "ONHOLD")])
-    start = DateField("Date Started", format="%Y-%m-%d")
-    end = DateField("Date Ended", format="%Y-%m-%d")
+    start = DateField("Date Started", format="%Y-%m-%d",validators=[Optional()])
+    end = DateField("Date Ended", format="%Y-%m-%d",validators=[Optional()])
     submit = SubmitField("Submit")
 
     def validate_po(self, po):

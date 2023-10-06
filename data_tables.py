@@ -61,3 +61,4 @@ project_breakdown = Table(
     Column("materials",Float,nullable=False),
     Column("tools_equip",Float,nullable=False),
 )
+meta.create_all(bind=engine)

@@ -1,11 +1,10 @@
 from datetime import datetime
+from data_tables import engine, project_table, users_table, expenses_table, type_table, project_breakdown
 from flask import Flask, flash, redirect, render_template, request, session
 from form import RegistrationForm, LoginForm, AddExpenseForm, AddProject, ProjectBreakdown
-from helper import login_required, get_x
-from sqlalchemy import insert, select, join, text, func
-from data_tables import engine, project_table, users_table, expenses_table, type_table, project_breakdown
+from helper import login_required, get_x,get_monthly_expense, get_project_list,delete_records
+from sqlalchemy import insert, select, join, text, func, update, delete
 from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import datetime
 
 app = Flask(__name__)
 
@@ -15,7 +14,29 @@ app.config['SECRET_KEY'] = "jan"
 @app.route("/")
 @login_required
 def index():
-    return render_template("dashboard.html")
+    with engine.connect() as conn:
+        stmt = select(func.sum(project_table.c.amount)).select_from(project_table)
+        contract_amount = conn.execute(stmt).first()
+        stmt2 = select(func.sum(expenses_table.c.total_cost)).select_from(expenses_table).where(expenses_table.c.project_id == 1)
+        total_admin = conn.execute(stmt2).first()
+
+    monthly = get_monthly_expense()
+    expense_total = 0
+    for i in monthly:
+        expense_total += i
+
+    project_list = []
+    get_project_list(project_list)
+
+    labels_chart2 = []
+    for i in project_list:
+        labels_chart2.append(i["po"])
+    
+    project_expenses = 0
+    for i in project_list:
+        project_expenses += i["expense"]
+
+    return render_template("home.html",monthly=monthly,total_amount=contract_amount.sum_1,expense_total=expense_total,labels_chart2=labels_chart2,project_list=project_list,total_admin=total_admin,project_expenses=project_expenses)
 
 
 @app.route("/logout")
@@ -76,10 +97,12 @@ def add():
 @login_required
 def project():
     breakdown = []
+    breakdown2 = []
     with engine.connect() as conn:
         statement = select(project_table)
         projects = conn.execute(statement)
         proj = conn.execute(statement)
+        proj2 = conn.execute(statement)
         y = conn.execute(statement)
         for i in y:
             stmt = select(project_breakdown.c.project_id, project_breakdown.c.labor, project_breakdown.c.representation, project_breakdown.c.remittance, project_breakdown.c.misc, project_breakdown.c.ppe, project_breakdown.c.materials, project_breakdown.c.tools_equip).where(project_breakdown.c.project_id == i.id)
@@ -87,10 +110,21 @@ def project():
             if proj_break != None:
                 x = get_x(proj_break,i,conn)
                 breakdown.append(x)
+                breakdown2.append(x)
             else:
                 x = {"status":False, "project_id":i.id}
                 breakdown.append(x)
-    return render_template("projects.html", projects=projects, proj=proj, breakdown=breakdown)
+                breakdown2.append(x)
+    return render_template("projects.html", projects=projects, proj=proj, breakdown=breakdown,proj2=proj2,breakdown2=breakdown2)
+
+@app.route("/project/delete",methods=["POST"])
+@login_required
+def delproject():
+    project_id = int(request.form.get('pro_id'))
+    delete_records(project_id)
+    flash("Expense Added Successfully", "success")    
+    return redirect("/project")
+
 
 @app.route("/addproject", methods=["POST", "GET"])
 @login_required
@@ -110,10 +144,32 @@ def addproject():
 @login_required
 def expense():
     with engine.connect() as conn:        
-        statement = text("SELECT title,date,description,type,recipt,recipt_no,no_items,unit_cost,total_cost FROM expenses JOIN projects ON expenses.project_id = projects.id JOIN type ON expenses.type_id = type.id")
+        statement = text("SELECT expenses.id,title,date,description,type,recipt,recipt_no,no_items,unit_cost,total_cost FROM expenses JOIN projects ON expenses.project_id = projects.id JOIN type ON expenses.type_id = type.id")
         expenses = conn.execute(statement)
 
     return render_template("expense.html",expenses=expenses)
+
+@app.route("/expense/delete", methods=["POST"])
+@login_required
+def expense_delete():
+    form_data = []
+    for name,value in request.form.items():
+        if name == "table_length":
+            continue
+        else:
+            form_data.append(int(value))
+
+    if not form_data:
+        flash("No items Deleted (Nothing was checked in the check boxes)", "danger")
+        return redirect("/expense")
+
+    with engine.connect() as conn:
+        for i in form_data:
+            stmt = delete(expenses_table).where(expenses_table.c.id == i)
+            conn.execute(stmt)
+        conn.commit()
+        flash(f"{len(form_data)} Items Successfully deleted", "success")
+    return redirect("/expense")
 
 @app.route("/breakdown", methods=["POST"])
 @login_required
@@ -142,8 +198,53 @@ def breakdown():
                 return redirect("/project")
         return render_template("breakdown.html", project_id=project_id, form=form)
     
-    
+@app.route("/breakdown/update", methods=["POST"])
+@login_required
+def breakdownupdate():
+    if request.form.get("source_update") == "projects":
+        form = ProjectBreakdown()
+        last_breakdown = {}
+        last_breakdown["labor"] = float(request.form.get("labor_breakdown"))
+        last_breakdown["representation"] = float(request.form.get("representation_breakdown"))
+        last_breakdown["remittance"] = float(request.form.get("remittance_breakdown"))
+        last_breakdown["misc"] = float(request.form.get("misc_breakdown"))
+        last_breakdown["ppe"] = float(request.form.get("ppe_breakdown"))
+        last_breakdown["materials"] = float(request.form.get("materials_breakdown"))
+        last_breakdown["tools_equip"] = float(request.form.get("tools_equip_breakdown"))
+        last_breakdown["total"] = float(request.form.get("total_breakdown"))
+        last_breakdown["id"] = request.form.get("project_id_breakdown")
 
+        project_id = request.form.get("project_id_breakdown")
+
+        return render_template("update_breakdown.html",last_breakdown=last_breakdown, project_id=project_id,form=form)
+    else:
+        form = ProjectBreakdown()
+        if form.validate_on_submit:
+            id = int(request.form.get("project_id_breakdown"))
+
+            with engine.connect() as conn:
+                stmt = select(project_table.c.amount).where(project_table.c.id == id)
+                budget = conn.execute(stmt).first()
+
+            if budget.amount < form.total.data:
+                flash("Total Amount is greater than contract amount", "danger")
+                last_breakdown = None
+                return render_template("update_breakdown.html", project_id=id,form=form,last_breakdown=last_breakdown)
+
+            with engine.connect() as conn:
+                stmt2 = update(project_breakdown).where(project_breakdown.c.project_id == id).values(labor=form.labor.data, representation=form.representation.data, remittance=form.remittance.data, misc=form.misc.data, ppe=form.ppe.data, materials=form.materials.data, tools_equip=form.tools_equip.data)
+                conn.execute(stmt2)
+                conn.commit()
+            flash("Updated Successfully", "success")
+        return redirect("/project")
+    
+@app.route("/admin")    
+@login_required
+def admin():
+    with engine.connect() as conn:        
+        statement = text("SELECT date,description,type,recipt,recipt_no,no_items,unit_cost,total_cost FROM expenses JOIN projects ON expenses.project_id = projects.id JOIN type ON expenses.type_id = type.id WHERE expenses.project_id = 1")
+        expenses = conn.execute(statement)
+    return render_template("admin.html",expenses=expenses)
 
 
 if __name__ == "__main__":

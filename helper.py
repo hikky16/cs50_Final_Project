@@ -1,7 +1,7 @@
 from flask import redirect, session
 from functools import wraps
-from sqlalchemy import select,func,text
-from data_tables import expenses_table
+from sqlalchemy import select,func,text, delete
+from data_tables import expenses_table, engine, project_table,project_breakdown
 
 
 def login_required(f):
@@ -78,3 +78,50 @@ def get_x(proj_break,i,conn):
         expen.append(z)
     x = {"project_id":proj_break.project_id, "labor":proj_break.labor, "representation":proj_break.representation, "remittance":proj_break.remittance, "misc":proj_break.misc, "ppe":proj_break.ppe, "materials":proj_break.materials, "tools_equip":proj_break.tools_equip, "status":True, "re_labor":proj_break.labor - labor, "re_representation":proj_break.representation - rep, "re_remittance":proj_break.remittance - remit, "re_misc":proj_break.misc - misc, "re_ppe":proj_break.ppe - ppe, "re_materials":proj_break.materials - mat, "re_tools_equip":proj_break.tools_equip - tol, "pro_expen":expen, "total":total_budget, "re_total":total_rem, "ex_total":total}
     return x
+
+def get_monthly_expense():
+    with engine.connect() as conn:
+        stmt = text("SELECT strftime('%Y-%m', date) AS 'month_date', SUM(total_cost) AS total_cost_sum FROM expenses GROUP BY strftime('%Y-%m', date) ORDER BY 'month_date'")
+        expenses = conn.execute(stmt)
+
+    date_list = ["2023-01","2023-02","2023-03","2023-04","2023-05","2023-06","2023-07","2023-08","2023-09","2023-10","2023-11","2023-12"]
+    data = {}
+    for i in expenses:
+       data[i.month_date] = i.total_cost_sum
+
+    data_date = data.keys()
+
+    monthly = []
+    for i in date_list:
+        if i in data_date:
+            monthly.append(data[i])
+        else:
+            monthly.append(0)
+
+    return monthly
+
+def get_project_list(project_list):
+    with engine.connect() as conn:
+        stmt2 = select(project_table.c.id,project_table.c.po,project_table.c.amount)
+        project_amounts = conn.execute(stmt2)
+        for i in project_amounts:
+            if i.id == 1:
+                continue
+            stmt3 = select(func.sum(expenses_table.c.total_cost)).where(expenses_table.c.project_id == i.id)
+            x = conn.execute(stmt3).first()
+            if x.sum_1 == None:
+                y = 0 
+            else: 
+                y = x.sum_1
+            z = {"po":i.po, "amount":i.amount, "expense":y}
+            project_list.append(z)
+
+def delete_records(project_id):
+    with engine.connect() as conn:
+        stmt = delete(project_breakdown).where(project_breakdown.c.project_id == project_id)
+        stmt2 = delete(expenses_table).where(expenses_table.c.project_id == project_id)
+        stmt3 = delete(project_table).where(project_table.c.id == project_id)
+        statements = [stmt,stmt2,stmt3]
+        for i in statements:
+            conn.execute(i)
+        conn.commit()

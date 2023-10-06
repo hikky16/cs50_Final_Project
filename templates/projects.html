@@ -1,6 +1,11 @@
 {% extends "dashboard.html" %}
 
 {% block title %} Projects {% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
 
 {% block main %}
 <a href="/addproject"><button class="btn btn-outline-primary mb-3">Add Project</button></a>
@@ -36,7 +41,7 @@
                 {% for item in breakdown|selectattr('project_id','equalto',project.id) %}
                     {% if item.status %}
                     <div class="row">
-                        <ol class="list-group col-6">
+                        <ol class="list-group col-6 ps-2">
                             <li class="list-group-item">
                                 <div class="hstack gap-1">
                                     <div class="vstack gap-1 col-2">
@@ -67,6 +72,7 @@
                                         <div class="text-success"><span>&#8369;{{ '{:,.2f}'.format(item.re_representation) }}</span></div>
                                         {% endif %}                                    
                                     </div>
+                                </div>
                             </li>
                             <li class="list-group-item">
                                 <div class="hstack gap-1">
@@ -172,7 +178,29 @@
                             </li>
                         </ol>
                     </div>
-                    <table class="table table-hover table-bordered table-sm align-middle align-top caption-top">
+                    <hr>
+                    <div class="row px-2">
+                        <div class="col-3">
+                            <form action="/breakdown/update" method="POST">
+                                <input type="hidden" value="{{ item.labor }}" name="labor_breakdown">
+                                <input type="hidden" value="{{ item.representation }}" name="representation_breakdown">
+                                <input type="hidden" value="{{ item.remittance }}" name="remittance_breakdown">
+                                <input type="hidden" value="{{ item.misc }}" name="misc_breakdown">
+                                <input type="hidden" value="{{ item.ppe }}" name="ppe_breakdown">
+                                <input type="hidden" value="{{ item.materials }}" name="materials_breakdown">
+                                <input type="hidden" value="{{ item.tools_equip }}" name="tools_equip_breakdown">
+                                <input type="hidden" value="{{ item.total }}" name="total_breakdown">
+                                <input value="projects" type="hidden" name="source_update">
+                                <input value="{{ item.project_id }}" id="test" type="hidden" name="project_id_breakdown">
+                                <button type="submit" class="btn btn-outline-primary">Change Project Beakdown</button>
+                            </form>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-outline-primary" style="width: 211px" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="Delete {{ project.title }}? All data including expenses will get deleted?" data-bs-modalvalue="{{ item.project_id }}">Delete Project</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <table class="table table-hover table-bordered table-sm align-middle align-top caption-top" id="table-{{ item.project_id }}">
                         <caption>All Expenses Total: &#8369;{{ '{:,.2f}'.format(item.ex_total) }}</caption>
                             <thead>
                                 <tr>
@@ -214,5 +242,54 @@
         {% endfor %}
     </div> 
     {% endif %}
-    
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel"></h1>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <form action="/project/delete" method="post"><input type="hidden" value="" name="pro_id"><button type="submit" class="btn btn-danger">DELETE</button></form>
+            </div>
+          </div>
+        </div>
+    </div>    
+{% endblock %}
+
+{% block script%}
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+{% for project in proj2|rejectattr('title','equalto','ADMIN') %}
+{% for item in breakdown2|selectattr('project_id','equalto',project.id) %}
+{% if item.status %}
+<script>
+    new DataTable('#table-{{ item.project_id }}');
+</script>
+{% endif %}
+{% endfor %}
+{% endfor %}
+<script>
+const exampleModal = document.getElementById('exampleModal')
+if (exampleModal) {
+  exampleModal.addEventListener('show.bs.modal', event => {
+    // Button that triggered the modal
+    const button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    const recipient = button.getAttribute('data-bs-whatever')
+    const modal_value = button.getAttribute('data-bs-modalvalue')
+    // If necessary, you could initiate an Ajax request here
+    // and then do the updating in a callback.
+
+    // Update the modal's content.
+    const modalTitle = exampleModal.querySelector('.modal-title')
+    const modalBodyInput = exampleModal.querySelector('.modal-body input')
+    const modalFooterInput = exampleModal.querySelector('.modal-footer input')
+
+    modalTitle.textContent = `${recipient}`
+    modalFooterInput.value = modal_value
+  })
+}
+</script>
 {% endblock %}
