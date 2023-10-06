@@ -1,0 +1,7 @@
+flask
+sqlalchemy
+werkzeug.security
+datetime
+functools
+flask_wtf
+wtforms

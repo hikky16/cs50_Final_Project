@@ -5,6 +5,7 @@ from data_tables import expenses_table, engine, project_table,project_breakdown
 
 
 def login_required(f):
+    "FROM CS50 finance helper"
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("username") is None:
