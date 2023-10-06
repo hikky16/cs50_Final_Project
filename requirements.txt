@@ -5,3 +5,4 @@ datetime
 functools
 flask_wtf
 wtforms
+secrets

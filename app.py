@@ -5,11 +5,11 @@ from form import RegistrationForm, LoginForm, AddExpenseForm, AddProject, Projec
 from helper import login_required, get_x,get_monthly_expense, get_project_list,delete_records
 from sqlalchemy import insert, select, join, text, func, update, delete
 from werkzeug.security import check_password_hash, generate_password_hash
+import secrets
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = "jan"
-
+app.config['SECRET_KEY'] = secrets.token_hex(16)
     
 @app.route("/")
 @login_required
